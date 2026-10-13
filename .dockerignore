@@ -1,12 +1,1 @@
-.dockerignore
-Dockerfile
-.eslintignore
-.eslintrc.json
-.gitignore
-.prettierignore
-.prettierrc.json
-.replit
-LICENSE
-README.md
-replit.nix
-.github/
+node_modules\n.git\npublic\n*.zip\n
