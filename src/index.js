@@ -9,8 +9,6 @@ Object.assign(wisp.options, {
   dns_servers: ["1.1.1.3", "1.0.0.3"],
 });
 
-const startedAt = Date.now();
-
 const server = createServer((req, res) => {
   const pathname = req.url?.split("?")[0];
 
