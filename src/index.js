@@ -5,12 +5,13 @@ logging.set_level(logging.NONE);
 
 Object.assign(wisp.options, {
   allow_udp_streams: false,
-  hostname_blacklist: [/example\\.com/],
+  hostname_blacklist: [/example\.com/],
   dns_servers: ["1.1.1.3", "1.0.0.3"],
 });
 
 const server = createServer((req, res) => {
-  const pathname = req.url?.split("?")[0];
+  // Ignore query strings and tolerate an optional trailing slash.
+  const pathname = (req.url || "/").split("?")[0].replace(/\/+$/, "") || "/";
 
   // Lightweight health check for uptime monitors and cron jobs.
   if ((req.method === "GET" || req.method === "HEAD") && pathname === "/health") {
@@ -23,9 +24,15 @@ const server = createServer((req, res) => {
 
     res.writeHead(200, {
       "content-type": "application/json; charset=utf-8",
+      "content-length": String(Buffer.byteLength(body)),
       "cache-control": "no-store",
     });
-    res.end(req.method === "HEAD" ? undefined : body);
+
+    if (req.method === "HEAD") {
+      res.end();
+    } else {
+      res.end(body);
+    }
     return;
   }
 
@@ -35,18 +42,20 @@ const server = createServer((req, res) => {
 });
 
 server.on("upgrade", (req, socket, head) => {
-  if (req.url?.split("?")[0] === "/wisp/") {
+  const pathname = (req.url || "/").split("?")[0];
+
+  if (pathname === "/wisp/") {
     wisp.routeRequest(req, socket, head);
   } else {
-    socket.end("HTTP/1.1 404 Not Found\\r\\nConnection: close\\r\\n\\r\\n");
+    socket.end("HTTP/1.1 404 Not Found\r\nConnection: close\r\n\r\n");
   }
 });
 
 const port = Number.parseInt(process.env.PORT || "8080", 10);
 server.listen(port, "0.0.0.0", () => {
   const address = server.address();
-  console.log(`Wisp backend listening on port ${address.port}`);
-  console.log(`WebSocket endpoint: ws(s)://<your-render-host>/wisp/`);
+  console.log("Wisp backend listening on port " + address.port);
+  console.log("WebSocket endpoint: ws(s)://<your-render-host>/wisp/");
   console.log("Health endpoint: /health");
 });
 
