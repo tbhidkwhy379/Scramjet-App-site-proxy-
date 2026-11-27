@@ -5,6 +5,7 @@ logging.set_level(logging.NONE);
 
 Object.assign(wisp.options, {
   allow_udp_streams: false,
+  dns_method: "resolve",
   hostname_blacklist: [/example\.com/],
   dns_servers: ["1.1.1.3", "1.0.0.3"],
 });
