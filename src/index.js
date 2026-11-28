@@ -1,11 +1,15 @@
 import { createServer } from "node:http";
 import { server as wisp, logging } from "@mercuryworkshop/wisp-js/server";
 
-logging.set_level(logging.NONE);
+// Keep Wisp network warnings visible in Render logs for diagnosing failed TCP/TLS streams.
+logging.set_level(logging.WARN);
 
 Object.assign(wisp.options, {
   allow_udp_streams: false,
   dns_method: "resolve",
+  // Render instances may not have working outbound IPv6. Prefer A records so
+  // Wisp does not choose an unreachable AAAA address before trying IPv4.
+  dns_result_order: "ipv4first",
   hostname_blacklist: [/example\.com/],
   dns_servers: ["1.1.1.3", "1.0.0.3"],
 });
