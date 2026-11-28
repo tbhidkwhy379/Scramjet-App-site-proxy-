@@ -27,6 +27,8 @@ After deployment, configure your frontend transport to use your Render URL, for 
 
 Do not use the GitHub Pages host as the Wisp endpoint. GitHub Pages cannot host the Wisp server.
 
+The backend prefers IPv4 DNS results for outbound Wisp TCP streams. This avoids selecting an IPv6 destination first on hosting environments where outbound IPv6 may not be available. Wisp network warnings are enabled in the Render logs.
+
 ## Important about MessagePort errors
 
 This backend-only setup cannot guarantee a client-side `MessagePort` error is fixed by itself. That error can also result from a frontend/service-worker version mismatch, an incorrect Wisp URL, or the browser/network blocking the WebSocket. Confirm that the deployed endpoint is reachable and that the frontend's Scramjet/BareMux versions match the installed package versions.
